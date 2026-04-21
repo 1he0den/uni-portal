@@ -1,0 +1,76 @@
+<div class="auth-page">
+  <mat-card class="auth-card">
+    <mat-card-content>
+      <div class="auth-brand">
+        <mat-icon class="brand-icon">school</mat-icon>
+        <h1>Uni Portal</h1>
+        <p class="subtitle">Регистрация</p>
+      </div>
+
+      <form (ngSubmit)="onSubmit()">
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Username</mat-label>
+          <input matInput name="username"
+                 [(ngModel)]="username"
+                 autocomplete="username" />
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Email</mat-label>
+          <input matInput type="email" name="email"
+                 [(ngModel)]="email"
+                 autocomplete="email" />
+        </mat-form-field>
+
+        <div class="form-row">
+          <mat-form-field appearance="outline">
+            <mat-label>Имя</mat-label>
+            <input matInput name="firstName"
+                   [(ngModel)]="firstName"
+                   autocomplete="given-name" />
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Фамилия</mat-label>
+            <input matInput name="lastName"
+                   [(ngModel)]="lastName"
+                   autocomplete="family-name" />
+          </mat-form-field>
+        </div>
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Пароль</mat-label>
+          <input matInput type="password" name="password"
+                 [(ngModel)]="password"
+                 autocomplete="new-password" />
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Роль</mat-label>
+          <mat-select name="role" [(ngModel)]="role">
+            <mat-option value="student">Студент</mat-option>
+            <mat-option value="teacher">Преподаватель</mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        @if (errorMessage) {
+          <div class="error-banner">
+            <mat-icon>error</mat-icon>
+            <span>{{ errorMessage }}</span>
+          </div>
+        }
+
+        <button mat-raised-button color="primary"
+                type="submit"
+                class="submit-btn"
+                [disabled]="loading">
+          {{ loading ? 'Регистрация...' : 'Зарегистрироваться' }}
+        </button>
+      </form>
+
+      <p class="switch-auth">
+        Уже есть аккаунт? <a routerLink="/login">Войти</a>
+      </p>
+    </mat-card-content>
+  </mat-card>
+</div>

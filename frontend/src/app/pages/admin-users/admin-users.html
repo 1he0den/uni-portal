@@ -1,0 +1,164 @@
+<div class="admin-page">
+  <div class="page-header">
+    <h1>Управление пользователями</h1>
+    <button mat-raised-button color="primary" (click)="toggleCreateForm()">
+      <mat-icon>{{ showCreateForm() ? 'close' : 'person_add' }}</mat-icon>
+      {{ showCreateForm() ? 'Скрыть форму' : 'Создать пользователя' }}
+    </button>
+  </div>
+
+  @if (showCreateForm()) {
+    <mat-card class="create-form-card">
+      <mat-card-header>
+        <mat-card-title>Новый пользователь</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="form-row">
+          <mat-form-field appearance="outline">
+            <mat-label>Username</mat-label>
+            <input matInput name="username" [(ngModel)]="newUser.username" />
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Email</mat-label>
+            <input matInput type="email" name="email" [(ngModel)]="newUser.email" />
+          </mat-form-field>
+        </div>
+
+        <div class="form-row">
+          <mat-form-field appearance="outline">
+            <mat-label>Имя</mat-label>
+            <input matInput name="first_name" [(ngModel)]="newUser.first_name" />
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Фамилия</mat-label>
+            <input matInput name="last_name" [(ngModel)]="newUser.last_name" />
+          </mat-form-field>
+        </div>
+
+        <div class="form-row">
+          <mat-form-field appearance="outline">
+            <mat-label>Пароль</mat-label>
+            <input matInput type="password" name="password"
+                   autocomplete="new-password"
+                   [(ngModel)]="newUser.password" />
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Роль</mat-label>
+            <mat-select name="role" [(ngModel)]="newUser.role">
+              <mat-option value="student">Студент</mat-option>
+              <mat-option value="teacher">Преподаватель</mat-option>
+              <mat-option value="admin">Администратор</mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+      </mat-card-content>
+      <mat-card-actions align="end">
+        <button mat-button (click)="toggleCreateForm()">Отмена</button>
+        <button mat-raised-button color="primary"
+                (click)="createUser()"
+                [disabled]="creating()">
+          {{ creating() ? 'Создание...' : 'Создать' }}
+        </button>
+      </mat-card-actions>
+    </mat-card>
+  }
+
+  <div class="filters-row">
+    <mat-form-field appearance="outline" class="search-field">
+      <mat-label>Поиск</mat-label>
+      <input matInput
+             [ngModel]="searchQuery()"
+             (ngModelChange)="searchQuery.set($event)"
+             placeholder="username, email, имя..." />
+      <mat-icon matSuffix>search</mat-icon>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="role-filter">
+      <mat-label>Роль</mat-label>
+      <mat-select [ngModel]="roleFilter()"
+                  (ngModelChange)="roleFilter.set($event)">
+        <mat-option value="all">Все</mat-option>
+        <mat-option value="student">Студенты</mat-option>
+        <mat-option value="teacher">Преподаватели</mat-option>
+        <mat-option value="admin">Администраторы</mat-option>
+      </mat-select>
+    </mat-form-field>
+  </div>
+
+  @if (loading()) {
+    <div class="loading">
+      <mat-spinner diameter="40"></mat-spinner>
+    </div>
+  }
+
+  @if (!loading() && errorMessage()) {
+    <div class="error-state">
+      <mat-icon>error</mat-icon>
+      <span>{{ errorMessage() }}</span>
+    </div>
+  }
+
+  @if (!loading() && !errorMessage()) {
+    @if (filteredUsers().length === 0) {
+      <div class="empty-state">
+        <mat-icon>person_search</mat-icon>
+        <p>Пользователи не найдены</p>
+      </div>
+    } @else {
+      <mat-card class="users-table-card">
+        <table mat-table [dataSource]="filteredUsers()" class="users-table">
+
+          <ng-container matColumnDef="id">
+            <th mat-header-cell *matHeaderCellDef>ID</th>
+            <td mat-cell *matCellDef="let user">{{ user.id }}</td>
+          </ng-container>
+
+          <ng-container matColumnDef="username">
+            <th mat-header-cell *matHeaderCellDef>Username</th>
+            <td mat-cell *matCellDef="let user">
+              <strong>{{ user.username }}</strong>
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="email">
+            <th mat-header-cell *matHeaderCellDef>Email</th>
+            <td mat-cell *matCellDef="let user">{{ user.email }}</td>
+          </ng-container>
+
+          <ng-container matColumnDef="full_name">
+            <th mat-header-cell *matHeaderCellDef>Имя</th>
+            <td mat-cell *matCellDef="let user">
+              {{ user.first_name }} {{ user.last_name }}
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="role">
+            <th mat-header-cell *matHeaderCellDef>Роль</th>
+            <td mat-cell *matCellDef="let user">
+              <span class="role-chip" [attr.data-role]="roleColor(user.role)">
+                {{ roleLabel(user.role) }}
+              </span>
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="actions">
+            <th mat-header-cell *matHeaderCellDef></th>
+            <td mat-cell *matCellDef="let user">
+              <button mat-icon-button color="warn"
+                      (click)="deleteUser(user)"
+                      matTooltip="Удалить">
+                <mat-icon>delete</mat-icon>
+              </button>
+            </td>
+          </ng-container>
+
+          <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+          <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+        </table>
+      </mat-card>
+    }
+  }
+</div>

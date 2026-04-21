@@ -1,0 +1,74 @@
+.app-toolbar {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  display: flex;
+  gap: 16px;
+  background: linear-gradient(90deg, #1565c0 0%, #1976d2 100%) !important;
+  color: #ffffff !important;
+  box-shadow: 0 2px 8px rgba(21, 101, 192, 0.25);
+}
+
+.app-toolbar a,
+.app-toolbar button {
+  color: #ffffff !important;
+}
+
+.app-title {
+  font-size: 20px;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+  color: #ffffff;
+}
+
+.app-nav {
+  display: flex;
+  gap: 4px;
+
+  a.active-link {
+    background: rgba(255, 255, 255, 0.22);
+  }
+}
+
+.spacer {
+  flex: 1;
+}
+
+.user-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.username {
+  font-weight: 500;
+}
+
+.menu-role {
+  padding: 8px 16px;
+  font-size: 13px;
+  color: rgba(0, 0, 0, 0.6);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.app-content {
+  padding: 24px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+@media (max-width: 640px) {
+  .app-title {
+    font-size: 16px;
+  }
+  .app-nav a {
+    min-width: auto !important;
+    padding: 0 8px !important;
+  }
+  .app-content {
+    padding: 16px;
+  }
+  .username {
+    display: none;
+  }
+}

@@ -1,0 +1,27 @@
+@if (user(); as u) {
+  <section class="welcome">
+    <div class="welcome-text">
+      <h1>Добро пожаловать, {{ u.first_name || u.username }}!</h1>
+      <span class="role-badge">{{ roleLabel() }}</span>
+    </div>
+  </section>
+
+  <section class="quick-actions">
+    <h2>Быстрые действия</h2>
+    <div class="actions-grid">
+      @for (action of quickActions(); track action.title) {
+        <mat-card class="action-card"
+                  [routerLink]="action.link"
+                  [fragment]="action.fragment">
+          <mat-card-content>
+            <div class="action-icon">
+              <mat-icon>{{ action.icon }}</mat-icon>
+            </div>
+            <h3>{{ action.title }}</h3>
+            <p>{{ action.description }}</p>
+          </mat-card-content>
+        </mat-card>
+      }
+    </div>
+  </section>
+}

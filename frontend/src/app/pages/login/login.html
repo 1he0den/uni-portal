@@ -1,0 +1,47 @@
+<div class="auth-page">
+  <mat-card class="auth-card">
+    <mat-card-content>
+      <div class="auth-brand">
+        <mat-icon class="brand-icon">school</mat-icon>
+        <h1>Uni Portal</h1>
+        <p class="subtitle">Вход в систему</p>
+      </div>
+
+      <form (ngSubmit)="onSubmit()">
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Username</mat-label>
+          <input matInput name="username"
+                 [(ngModel)]="username"
+                 autocomplete="username" />
+          <mat-icon matSuffix>person</mat-icon>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Пароль</mat-label>
+          <input matInput type="password" name="password"
+                 [(ngModel)]="password"
+                 autocomplete="current-password" />
+          <mat-icon matSuffix>lock</mat-icon>
+        </mat-form-field>
+
+        @if (errorMessage) {
+          <div class="error-banner">
+            <mat-icon>error</mat-icon>
+            <span>{{ errorMessage }}</span>
+          </div>
+        }
+
+        <button mat-raised-button color="primary"
+                type="submit"
+                class="submit-btn"
+                [disabled]="loading">
+          {{ loading ? 'Вход...' : 'Войти' }}
+        </button>
+      </form>
+
+      <p class="switch-auth">
+        Нет аккаунта? <a routerLink="/register">Зарегистрироваться</a>
+      </p>
+    </mat-card-content>
+  </mat-card>
+</div>

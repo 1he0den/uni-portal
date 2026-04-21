@@ -1,0 +1,51 @@
+@if (user(); as u) {
+  <div class="profile-page">
+    <h1>Мой профиль</h1>
+
+    <mat-card class="profile-card">
+      <mat-card-content>
+        <div class="profile-header">
+          <div class="avatar">
+            <mat-icon>account_circle</mat-icon>
+          </div>
+          <div class="profile-name">
+            <h2>
+              @if (u.first_name || u.last_name) {
+                {{ u.first_name }} {{ u.last_name }}
+              } @else {
+                {{ u.username }}
+              }
+            </h2>
+            <span class="role-badge">{{ roleLabel(u.role) }}</span>
+          </div>
+        </div>
+
+        <div class="profile-info">
+          <div class="info-row">
+            <mat-icon>badge</mat-icon>
+            <div>
+              <div class="label">Username</div>
+              <div class="value">{{ u.username }}</div>
+            </div>
+          </div>
+
+          <div class="info-row">
+            <mat-icon>mail</mat-icon>
+            <div>
+              <div class="label">Email</div>
+              <div class="value">{{ u.email }}</div>
+            </div>
+          </div>
+
+          <div class="info-row">
+            <mat-icon>tag</mat-icon>
+            <div>
+              <div class="label">ID</div>
+              <div class="value">{{ u.id }}</div>
+            </div>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </div>
+}

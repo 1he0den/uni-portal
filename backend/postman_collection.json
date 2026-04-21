@@ -1,0 +1,683 @@
+﻿{
+  "info": {
+    "name": "Uni Portal Full Backend API",
+    "_postman_id": "7d844b11-e0d8-4f72-bfd9-9f526131237a",
+    "description": "Extended API collection for frontend and defense: auth, users, profile, teacher courses, and CRUD for core resources.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Login",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/login/",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "auth", "login", ""]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"teacher1\",\n  \"password\": \"StrongPass123!\"\n}"
+            }
+          },
+          "response": [
+            {
+              "name": "200 OK",
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "body": "{\n  \"access\": \"<jwt_access_token>\",\n  \"refresh\": \"<jwt_refresh_token>\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Refresh Token",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/refresh/",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "auth", "refresh", ""]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"refresh\": \"{{refreshToken}}\"\n}"
+            }
+          },
+          "response": [
+            {
+              "name": "200 OK",
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "body": "{\n  \"access\": \"<new_jwt_access_token>\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Logout",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{accessToken}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/logout/",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "auth", "logout", ""]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"refresh\": \"{{refreshToken}}\"\n}"
+            }
+          },
+          "response": [
+            {
+              "name": "200 OK",
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "body": "{\n  \"detail\": \"Logout successful.\"\n}"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Users & Profile",
+      "item": [
+        {
+          "name": "Register User",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/users/",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "users", ""]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"student2\",\n  \"email\": \"student2@example.com\",\n  \"password\": \"StrongPass123!\",\n  \"first_name\": \"Aruzhan\",\n  \"last_name\": \"N\",\n  \"role\": \"student\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Profile Me",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{accessToken}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/profile/",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "profile", ""]
+            }
+          }
+        },
+        {
+          "name": "List Users (admin)",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{adminAccessToken}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/users/",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "users", ""]
+            }
+          }
+        },
+        {
+          "name": "User Detail",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{accessToken}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/users/{{userId}}/",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "users", "{{userId}}", ""]
+            }
+          }
+        },
+        {
+          "name": "Teacher Courses",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{accessToken}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/teachers/{{teacherId}}/courses/",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "teachers", "{{teacherId}}", "courses", ""]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Courses",
+      "item": [
+        {
+          "name": "Create Course",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{teacherAccessToken}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/courses/",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "courses", ""]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Physics\",\n  \"description\": \"Intro Physics\",\n  \"credits\": 4\n}"
+            }
+          }
+        },
+        {
+          "name": "List Courses",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{accessToken}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/courses/",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "courses", ""]
+            }
+          }
+        },
+        {
+          "name": "Course Detail",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{accessToken}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/courses/{{courseId}}/",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "courses", "{{courseId}}", ""]
+            }
+          }
+        },
+        {
+          "name": "Update Course",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{teacherAccessToken}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/courses/{{courseId}}/",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "courses", "{{courseId}}", ""]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"credits\": 5\n}"
+            }
+          }
+        },
+        {
+          "name": "Delete Course",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{teacherAccessToken}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/courses/{{courseId}}/",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "courses", "{{courseId}}", ""]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Enrollments",
+      "item": [
+        {
+          "name": "Create Enrollment",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{studentAccessToken}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/enrollments/",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "enrollments", ""]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"course_id\": {{courseId}}\n}"
+            }
+          }
+        },
+        {
+          "name": "List Enrollments",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{accessToken}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/enrollments/",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "enrollments", ""]
+            }
+          }
+        },
+        {
+          "name": "Enrollment Detail",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{accessToken}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/enrollments/{{enrollmentId}}/",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "enrollments", "{{enrollmentId}}", ""]
+            }
+          }
+        },
+        {
+          "name": "Delete Enrollment",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{accessToken}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/enrollments/{{enrollmentId}}/",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "enrollments", "{{enrollmentId}}", ""]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Tasks",
+      "item": [
+        {
+          "name": "Create Task",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{teacherAccessToken}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/tasks/",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "tasks", ""]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Homework 1\",\n  \"description\": \"Intro task\",\n  \"deadline\": \"2026-05-01T12:00:00Z\",\n  \"course_id\": {{courseId}},\n  \"max_points\": 100,\n  \"file_url\": \"https://example.com/task.pdf\"\n}"
+            }
+          }
+        },
+        {
+          "name": "List Tasks",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{accessToken}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/tasks/",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "tasks", ""]
+            }
+          }
+        },
+        {
+          "name": "Task Detail",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{accessToken}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/tasks/{{taskId}}/",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "tasks", "{{taskId}}", ""]
+            }
+          }
+        },
+        {
+          "name": "Update Task",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{teacherAccessToken}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/tasks/{{taskId}}/",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "tasks", "{{taskId}}", ""]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"max_points\": 120\n}"
+            }
+          }
+        },
+        {
+          "name": "Delete Task",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{teacherAccessToken}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/tasks/{{taskId}}/",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "tasks", "{{taskId}}", ""]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Submissions",
+      "item": [
+        {
+          "name": "Create Submission",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{studentAccessToken}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/submissions/",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "submissions", ""]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"task_id\": {{taskId}},\n  \"file_url\": \"https://example.com/work.pdf\"\n}"
+            }
+          }
+        },
+        {
+          "name": "List Submissions",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{accessToken}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/submissions/",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "submissions", ""]
+            }
+          }
+        },
+        {
+          "name": "Submission Detail",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{accessToken}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/submissions/{{submissionId}}/",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "submissions", "{{submissionId}}", ""]
+            }
+          }
+        },
+        {
+          "name": "Grade Submission (teacher)",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{teacherAccessToken}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/submissions/{{submissionId}}/",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "submissions", "{{submissionId}}", ""]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"grade\": 95.5,\n  \"feedback\": \"Well done\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Delete Submission",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{accessToken}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/submissions/{{submissionId}}/",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "submissions", "{{submissionId}}", ""]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Announcements",
+      "item": [
+        {
+          "name": "Create Announcement",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{teacherAccessToken}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/announcements/",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "announcements", ""]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Welcome\",\n  \"content\": \"Course starts next week\",\n  \"course_id\": {{courseId}}\n}"
+            }
+          }
+        },
+        {
+          "name": "List Announcements",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{accessToken}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/announcements/",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "announcements", ""]
+            }
+          }
+        },
+        {
+          "name": "Announcement Detail",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{accessToken}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/announcements/{{announcementId}}/",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "announcements", "{{announcementId}}", ""]
+            }
+          }
+        },
+        {
+          "name": "Update Announcement",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{teacherAccessToken}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/announcements/{{announcementId}}/",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "announcements", "{{announcementId}}", ""]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"content\": \"Updated announcement text\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Delete Announcement",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{teacherAccessToken}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/announcements/{{announcementId}}/",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "announcements", "{{announcementId}}", ""]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Materials",
+      "item": [
+        {
+          "name": "Create Material",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{teacherAccessToken}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/materials/",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "materials", ""]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Lecture Slides\",\n  \"file_url\": \"https://example.com/slides.pdf\",\n  \"course_id\": {{courseId}}\n}"
+            }
+          }
+        },
+        {
+          "name": "List Materials",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{accessToken}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/materials/",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "materials", ""]
+            }
+          }
+        },
+        {
+          "name": "Material Detail",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{accessToken}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/materials/{{materialId}}/",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "materials", "{{materialId}}", ""]
+            }
+          }
+        },
+        {
+          "name": "Update Material",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{teacherAccessToken}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/materials/{{materialId}}/",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "materials", "{{materialId}}", ""]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Updated Lecture Slides\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Delete Material",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{teacherAccessToken}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/materials/{{materialId}}/",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "materials", "{{materialId}}", ""]
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "variable": [
+    { "key": "baseUrl", "value": "http://127.0.0.1:8000" },
+    { "key": "accessToken", "value": "" },
+    { "key": "refreshToken", "value": "" },
+    { "key": "studentAccessToken", "value": "" },
+    { "key": "teacherAccessToken", "value": "" },
+    { "key": "adminAccessToken", "value": "" },
+    { "key": "userId", "value": "1" },
+    { "key": "teacherId", "value": "1" },
+    { "key": "courseId", "value": "1" },
+    { "key": "enrollmentId", "value": "1" },
+    { "key": "taskId", "value": "1" },
+    { "key": "submissionId", "value": "1" },
+    { "key": "announcementId", "value": "1" },
+    { "key": "materialId", "value": "1" }
+  ]
+}

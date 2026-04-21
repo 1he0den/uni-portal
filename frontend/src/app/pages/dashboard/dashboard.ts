@@ -58,6 +58,18 @@ export class Dashboard {
           link: '/courses',
         },
         {
+          title: 'Задания',
+          description: 'Список заданий по вашим курсам',
+          icon: 'assignment',
+          link: '/tasks',
+        },
+        {
+          title: 'Отправки',
+          description: 'Отправить работу и смотреть оценки',
+          icon: 'upload_file',
+          link: '/submissions',
+        },
+        {
           title: 'Мой профиль',
           description: 'Личные данные и настройки',
           icon: 'person',
@@ -75,11 +87,41 @@ export class Dashboard {
           link: '/courses',
         },
         {
+          title: 'Курсы (endpoint teacher)',
+          description: 'Список курсов через /teachers/{id}/courses',
+          icon: 'fact_check',
+          link: '/teacher/courses',
+        },
+        {
           title: 'Создать курс',
           description: 'Добавить новый курс',
           icon: 'add_circle',
           link: '/courses',
           fragment: 'create',
+        },
+        {
+          title: 'Задания',
+          description: 'Создание и редактирование заданий',
+          icon: 'assignment',
+          link: '/tasks',
+        },
+        {
+          title: 'Submissions',
+          description: 'Проверка и выставление оценок',
+          icon: 'assignment_turned_in',
+          link: '/submissions',
+        },
+        {
+          title: 'Announcements',
+          description: 'Объявления по курсам',
+          icon: 'campaign',
+          link: '/announcements',
+        },
+        {
+          title: 'Materials',
+          description: 'Материалы по курсам',
+          icon: 'folder_open',
+          link: '/materials',
         },
         {
           title: 'Мой профиль',
@@ -103,6 +145,36 @@ export class Dashboard {
           description: 'Управление всеми курсами',
           icon: 'school',
           link: '/courses',
+        },
+        {
+          title: 'Teacher courses',
+          description: 'Просмотр курсов преподавателя',
+          icon: 'fact_check',
+          link: '/teacher/courses',
+        },
+        {
+          title: 'Задания',
+          description: 'CRUD заданий',
+          icon: 'assignment',
+          link: '/tasks',
+        },
+        {
+          title: 'Submissions',
+          description: 'CRUD отправок и оценивание',
+          icon: 'assignment_turned_in',
+          link: '/submissions',
+        },
+        {
+          title: 'Announcements',
+          description: 'CRUD объявлений',
+          icon: 'campaign',
+          link: '/announcements',
+        },
+        {
+          title: 'Materials',
+          description: 'CRUD материалов',
+          icon: 'folder_open',
+          link: '/materials',
         },
         {
           title: 'Мой профиль',

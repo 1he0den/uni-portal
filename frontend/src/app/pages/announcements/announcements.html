@@ -1,0 +1,99 @@
+<div class="announcements-page">
+  <div class="page-header">
+    <h1>Announcements</h1>
+
+    @if (role() === 'teacher' || role() === 'admin') {
+      <button mat-raised-button color="primary" (click)="toggleForm()">
+        <mat-icon>{{ showForm() ? 'close' : 'add' }}</mat-icon>
+        {{ showForm() ? 'Скрыть форму' : 'Создать объявление' }}
+      </button>
+    }
+  </div>
+
+  @if (showForm() && (role() === 'teacher' || role() === 'admin')) {
+    <mat-card class="create-form-card">
+      <mat-card-header>
+        <mat-card-title>
+          {{ editingId() !== null ? 'Редактировать объявление' : 'Новое объявление' }}
+        </mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Заголовок</mat-label>
+          <input matInput name="title" [(ngModel)]="form.title" />
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Текст</mat-label>
+          <textarea matInput rows="4" name="content" [(ngModel)]="form.content"></textarea>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Курс</mat-label>
+          <mat-select name="course_id" [(ngModel)]="form.course_id">
+            @for (course of courses(); track course.id) {
+              <mat-option [value]="course.id">
+                {{ course.name }} (ID: {{ course.id }})
+              </mat-option>
+            }
+          </mat-select>
+        </mat-form-field>
+      </mat-card-content>
+      <mat-card-actions align="end">
+        <button mat-button (click)="toggleForm()">Отмена</button>
+        <button mat-raised-button color="primary" (click)="submit()" [disabled]="saving()">
+          {{ saving() ? 'Сохранение...' : (editingId() !== null ? 'Сохранить' : 'Создать') }}
+        </button>
+      </mat-card-actions>
+    </mat-card>
+  }
+
+  @if (loading()) {
+    <div class="loading">
+      <mat-spinner diameter="40"></mat-spinner>
+    </div>
+  }
+
+  @if (!loading() && errorMessage()) {
+    <div class="error-state">
+      <mat-icon>error</mat-icon>
+      <span>{{ errorMessage() }}</span>
+    </div>
+  }
+
+  @if (!loading() && !errorMessage()) {
+    @if (announcements().length === 0) {
+      <div class="empty-state">
+        <mat-icon>campaign</mat-icon>
+        <p>Объявлений пока нет</p>
+      </div>
+    } @else {
+      <div class="announcements-grid">
+        @for (a of announcements(); track a.id) {
+          <mat-card class="announcement-card">
+            <mat-card-header>
+              <mat-card-title>{{ a.title }}</mat-card-title>
+              <mat-card-subtitle>
+                {{ courseLabel(a.course_id) }} • {{ a.created_at | datetime }}
+              </mat-card-subtitle>
+            </mat-card-header>
+            <mat-card-content>
+              <p>{{ a.content }}</p>
+            </mat-card-content>
+            @if (role() === 'teacher' || role() === 'admin') {
+              <mat-card-actions align="end">
+                <button mat-stroked-button (click)="startEdit(a)">
+                  <mat-icon>edit</mat-icon> Редактировать
+                </button>
+                <button mat-stroked-button color="warn" (click)="delete(a.id)">
+                  <mat-icon>delete</mat-icon> Удалить
+                </button>
+              </mat-card-actions>
+            }
+          </mat-card>
+        }
+      </div>
+    }
+  }
+</div>
+

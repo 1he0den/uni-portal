@@ -37,3 +37,29 @@ export const adminGuard: CanActivateFn = () => {
   router.navigate(['/dashboard']);
   return false;
 };
+
+export const teacherOrAdminGuard: CanActivateFn = () => {
+  const authService = inject(AuthService);
+  const router = inject(Router);
+
+  const role = authService.role();
+  if (role === 'teacher' || role === 'admin') {
+    return true;
+  }
+
+  router.navigate(['/dashboard']);
+  return false;
+};
+
+export const studentOrAdminGuard: CanActivateFn = () => {
+  const authService = inject(AuthService);
+  const router = inject(Router);
+
+  const role = authService.role();
+  if (role === 'student' || role === 'admin') {
+    return true;
+  }
+
+  router.navigate(['/dashboard']);
+  return false;
+};

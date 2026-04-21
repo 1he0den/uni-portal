@@ -1,0 +1,179 @@
+<div class="submissions-page">
+  <div class="page-header">
+    <h1>Submissions</h1>
+  </div>
+
+  @if (loading()) {
+    <div class="loading">
+      <mat-spinner diameter="40"></mat-spinner>
+    </div>
+  }
+
+  @if (!loading() && errorMessage()) {
+    <div class="error-state">
+      <mat-icon>error</mat-icon>
+      <span>{{ errorMessage() }}</span>
+    </div>
+  }
+
+  @if (!loading() && !errorMessage()) {
+    @if (role() === 'student' || role() === 'admin') {
+      <mat-tab-group>
+        <mat-tab label="Отправить работу">
+          <mat-card class="create-form-card">
+            <mat-card-header>
+              <mat-card-title>Новая отправка</mat-card-title>
+            </mat-card-header>
+            <mat-card-content>
+              <div class="form-row">
+                <mat-form-field appearance="outline">
+                  <mat-label>Задание</mat-label>
+                  <mat-select name="task_id" [(ngModel)]="submitForm.task_id">
+                    @for (task of tasks(); track task.id) {
+                      <mat-option [value]="task.id">
+                        {{ task.name }} (ID: {{ task.id }})
+                      </mat-option>
+                    }
+                  </mat-select>
+                </mat-form-field>
+
+                <mat-form-field appearance="outline">
+                  <mat-label>File URL</mat-label>
+                  <input matInput name="file_url" [(ngModel)]="submitForm.file_url" />
+                </mat-form-field>
+              </div>
+            </mat-card-content>
+            <mat-card-actions align="end">
+              <button mat-raised-button color="primary" (click)="submit()" [disabled]="submitting()">
+                {{ submitting() ? 'Отправка...' : 'Отправить' }}
+              </button>
+            </mat-card-actions>
+          </mat-card>
+        </mat-tab>
+
+        <mat-tab label="Мои отправки">
+          @if (submissions().length === 0) {
+            <div class="empty-state">
+              <mat-icon>upload_file</mat-icon>
+              <p>Отправок пока нет</p>
+            </div>
+          } @else {
+            <div class="submissions-grid">
+              @for (s of submissions(); track s.id) {
+                <mat-card class="submission-card">
+                  <mat-card-header>
+                    <mat-card-title>{{ taskLabel(s.task_id) }}</mat-card-title>
+                    <mat-card-subtitle>
+                      Submitted: {{ s.submitted_at | datetime }} • Late: {{ s.is_late ? 'yes' : 'no' }}
+                    </mat-card-subtitle>
+                  </mat-card-header>
+                  <mat-card-content>
+                    @if (s.file_url) {
+                      <p class="meta">
+                        <mat-icon>link</mat-icon>
+                        <span>{{ s.file_url }}</span>
+                      </p>
+                    }
+                    <p class="meta">
+                      <mat-icon>grade</mat-icon>
+                      <span>{{ s.grade === null ? '—' : s.grade }}</span>
+                    </p>
+                    @if (s.feedback) {
+                      <p class="meta">
+                        <mat-icon>comment</mat-icon>
+                        <span>{{ s.feedback }}</span>
+                      </p>
+                    }
+                  </mat-card-content>
+                  <mat-card-actions align="end">
+                    <button mat-stroked-button color="warn" (click)="delete(s.id)">
+                      <mat-icon>delete</mat-icon>
+                      Удалить
+                    </button>
+                  </mat-card-actions>
+                </mat-card>
+              }
+            </div>
+          }
+        </mat-tab>
+      </mat-tab-group>
+    }
+
+    @if (role() === 'teacher') {
+      <mat-card class="hint-card">
+        <mat-card-content>
+          <mat-icon>info</mat-icon>
+          <span>Как преподаватель вы видите submissions ваших курсов и можете выставлять оценки.</span>
+        </mat-card-content>
+      </mat-card>
+    }
+
+    @if (role() === 'teacher' || role() === 'admin') {
+      @if (submissions().length === 0) {
+        <div class="empty-state">
+          <mat-icon>assignment_turned_in</mat-icon>
+          <p>Submissions пока нет</p>
+        </div>
+      } @else {
+        <div class="submissions-grid">
+          @for (s of submissions(); track s.id) {
+            <mat-card class="submission-card">
+              <mat-card-header>
+                <mat-card-title>{{ taskLabel(s.task_id) }}</mat-card-title>
+                <mat-card-subtitle>
+                  Student ID: {{ s.student_id }} • Submitted: {{ s.submitted_at | datetime }}
+                </mat-card-subtitle>
+              </mat-card-header>
+              <mat-card-content>
+                @if (s.file_url) {
+                  <p class="meta">
+                    <mat-icon>link</mat-icon>
+                    <span>{{ s.file_url }}</span>
+                  </p>
+                }
+
+                @if (gradingId() !== s.id) {
+                  <p class="meta">
+                    <mat-icon>grade</mat-icon>
+                    <span>{{ s.grade === null ? '—' : s.grade }}</span>
+                  </p>
+                  @if (s.feedback) {
+                    <p class="meta">
+                      <mat-icon>comment</mat-icon>
+                      <span>{{ s.feedback }}</span>
+                    </p>
+                  }
+                } @else {
+                  <div class="form-row">
+                    <mat-form-field appearance="outline">
+                      <mat-label>Grade</mat-label>
+                      <input matInput type="number" name="grade" [(ngModel)]="gradeForm.grade" />
+                    </mat-form-field>
+                    <mat-form-field appearance="outline">
+                      <mat-label>Feedback</mat-label>
+                      <input matInput name="feedback" [(ngModel)]="gradeForm.feedback" />
+                    </mat-form-field>
+                  </div>
+                }
+              </mat-card-content>
+              <mat-card-actions align="end">
+                @if (gradingId() !== s.id) {
+                  <button mat-stroked-button (click)="startGrade(s)">
+                    <mat-icon>edit</mat-icon>
+                    Оценить
+                  </button>
+                } @else {
+                  <button mat-button (click)="cancelGrade()">Отмена</button>
+                  <button mat-raised-button color="primary" (click)="saveGrade()" [disabled]="grading()">
+                    {{ grading() ? 'Сохранение...' : 'Сохранить' }}
+                  </button>
+                }
+              </mat-card-actions>
+            </mat-card>
+          }
+        </div>
+      }
+    }
+  }
+</div>
+

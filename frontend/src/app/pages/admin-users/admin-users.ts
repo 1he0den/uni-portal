@@ -14,6 +14,7 @@ import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { UserService, CreateUserRequest } from '../../services/user';
 import { AuthService } from '../../services/auth';
 import { User, UserRole } from '../../models/user.model';
+import { extractApiErrorMessage } from '../../api/error';
 
 @Component({
   selector: 'app-admin-users',
@@ -66,6 +67,8 @@ export class AdminUsers implements OnInit {
 
   readonly showCreateForm = signal(false);
   readonly creating = signal(false);
+  readonly editingUserId = signal<number | null>(null);
+  readonly loadingUser = signal(false);
 
   newUser: CreateUserRequest = {
     username: '',
@@ -91,7 +94,7 @@ export class AdminUsers implements OnInit {
       },
       error: (err) => {
         this.errorMessage.set(
-          err?.error?.detail || 'Не удалось загрузить пользователей'
+          extractApiErrorMessage(err) || 'Не удалось загрузить пользователей'
         );
         this.loading.set(false);
       },
@@ -104,6 +107,37 @@ export class AdminUsers implements OnInit {
     } else {
       this.showCreateForm.set(true);
     }
+  }
+
+  startEdit(user: User): void {
+    this.loadingUser.set(true);
+    this.userService.getUser(user.id).subscribe({
+      next: (full) => {
+        this.loadingUser.set(false);
+        this.editingUserId.set(full.id);
+        this.showCreateForm.set(true);
+        this.newUser = {
+          username: full.username,
+          email: full.email,
+          password: '',
+          first_name: full.first_name,
+          last_name: full.last_name,
+          role: full.role,
+        };
+      },
+      error: (err) => {
+        this.loadingUser.set(false);
+        this.snackBar.open(extractApiErrorMessage(err) || 'Не удалось загрузить пользователя', 'OK', {
+          duration: 4500,
+        });
+      },
+    });
+  }
+
+  createOrUpdateUserPatch(): void {
+    const editingId = this.editingUserId();
+    if (editingId !== null) return this.updateUserPatch(editingId);
+    return this.createUser();
   }
 
   createUser(): void {
@@ -129,8 +163,70 @@ export class AdminUsers implements OnInit {
       },
       error: (err) => {
         this.creating.set(false);
-        const msg = this.extractError(err) || 'Не удалось создать пользователя';
+        const msg = extractApiErrorMessage(err) || 'Не удалось создать пользователя';
         this.snackBar.open(msg, 'OK', { duration: 4000 });
+      },
+    });
+  }
+
+  updateUserPatch(id: number): void {
+    if (!this.newUser.username || !this.newUser.email || !this.newUser.first_name || !this.newUser.last_name) {
+      this.snackBar.open('Заполни username, email, имя и фамилию', 'OK', { duration: 3000 });
+      return;
+    }
+
+    this.creating.set(true);
+
+    const payload: Partial<CreateUserRequest> & { password?: string } = {
+      username: this.newUser.username,
+      email: this.newUser.email,
+      first_name: this.newUser.first_name,
+      last_name: this.newUser.last_name,
+      role: this.newUser.role,
+    };
+    if (this.newUser.password) payload.password = this.newUser.password;
+
+    this.userService.patchUser(id, payload).subscribe({
+      next: () => {
+        this.creating.set(false);
+        this.snackBar.open('Пользователь обновлён (PATCH)', 'OK', { duration: 3000 });
+        this.resetForm();
+        this.loadUsers();
+      },
+      error: (err) => {
+        this.creating.set(false);
+        this.snackBar.open(extractApiErrorMessage(err) || 'Не удалось обновить пользователя', 'OK', {
+          duration: 4500,
+        });
+      },
+    });
+  }
+
+  updateUserPut(id: number): void {
+    if (
+      !this.newUser.username ||
+      !this.newUser.email ||
+      !this.newUser.password ||
+      !this.newUser.first_name ||
+      !this.newUser.last_name
+    ) {
+      this.snackBar.open('Для PUT заполни все поля, включая пароль', 'OK', { duration: 3500 });
+      return;
+    }
+
+    this.creating.set(true);
+    this.userService.updateUser(id, this.newUser).subscribe({
+      next: () => {
+        this.creating.set(false);
+        this.snackBar.open('Пользователь обновлён (PUT)', 'OK', { duration: 3000 });
+        this.resetForm();
+        this.loadUsers();
+      },
+      error: (err) => {
+        this.creating.set(false);
+        this.snackBar.open(extractApiErrorMessage(err) || 'Не удалось обновить пользователя', 'OK', {
+          duration: 4500,
+        });
       },
     });
   }
@@ -150,7 +246,7 @@ export class AdminUsers implements OnInit {
         this.loadUsers();
       },
       error: (err) => {
-        const msg = this.extractError(err) || 'Не удалось удалить';
+        const msg = extractApiErrorMessage(err) || 'Не удалось удалить';
         this.snackBar.open(msg, 'OK', { duration: 4000 });
       },
     });
@@ -180,6 +276,7 @@ export class AdminUsers implements OnInit {
 
   private resetForm(): void {
     this.showCreateForm.set(false);
+    this.editingUserId.set(null);
     this.newUser = {
       username: '',
       email: '',
@@ -190,20 +287,5 @@ export class AdminUsers implements OnInit {
     };
   }
 
-  private extractError(error: unknown): string {
-    const err = error as { error?: Record<string, unknown> | string };
-    const data = err?.error;
-    if (!data) return '';
-    if (typeof data === 'string') return data;
-    if (typeof data === 'object' && 'detail' in data) return String(data['detail']);
-    if (typeof data === 'object') {
-      const entries = Object.entries(data);
-      if (entries.length > 0) {
-        const [field, messages] = entries[0];
-        const msg = Array.isArray(messages) ? messages[0] : messages;
-        return `${field}: ${String(msg)}`;
-      }
-    }
-    return '';
-  }
+  // NOTE: error extraction is centralized in ../../api/error
 }

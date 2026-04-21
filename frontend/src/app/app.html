@@ -9,6 +9,23 @@
   <a mat-button routerLink="/courses" routerLinkActive="active-link">
     Courses
   </a>
+  <a mat-button routerLink="/tasks" routerLinkActive="active-link">
+    Tasks
+  </a>
+  <a mat-button routerLink="/submissions" routerLinkActive="active-link">
+    Submissions
+  </a>
+  <a mat-button routerLink="/announcements" routerLinkActive="active-link">
+    Announcements
+  </a>
+  <a mat-button routerLink="/materials" routerLinkActive="active-link">
+    Materials
+  </a>
+  @if (authService.role() === 'teacher' || authService.role() === 'admin') {
+    <a mat-button routerLink="/teacher/courses" routerLinkActive="active-link">
+      Teacher courses
+    </a>
+  }
   <a mat-button routerLink="/profile" routerLinkActive="active-link">
     Profile
   </a>

@@ -7,6 +7,7 @@ import {
 } from '@angular/common/http';
 import { inject } from '@angular/core';
 import { Router } from '@angular/router';
+import { API_URL } from '../api/api.config';
 import {
   catchError,
   switchMap,
@@ -81,7 +82,7 @@ function handle401(
 
   return http
     .post<{ access: string; refresh?: string }>(
-      'http://127.0.0.1:8000/api/auth/refresh/',
+      `${API_URL}/auth/refresh/`,
       { refresh: refreshToken }
     )
     .pipe(

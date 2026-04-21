@@ -1,0 +1,174 @@
+<div class="tasks-page">
+  <div class="page-header">
+    <h1>Tasks</h1>
+
+    @if (role() === 'teacher' || role() === 'admin') {
+      <button mat-raised-button color="primary" (click)="toggleForm()">
+        <mat-icon>{{ showForm() ? 'close' : 'add' }}</mat-icon>
+        {{ showForm() ? 'Скрыть форму' : 'Создать задание' }}
+      </button>
+    }
+  </div>
+
+  @if (showForm() && (role() === 'teacher' || role() === 'admin')) {
+    <mat-card class="create-form-card">
+      <mat-card-header>
+        <mat-card-title>
+          {{ editingId() !== null ? 'Редактировать задание' : 'Новое задание' }}
+        </mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Название</mat-label>
+          <input matInput name="name" [(ngModel)]="form.name" />
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Описание</mat-label>
+          <textarea
+            matInput
+            rows="3"
+            name="description"
+            [(ngModel)]="form.description"
+          ></textarea>
+        </mat-form-field>
+
+        <div class="form-row">
+          <div class="deadline-group">
+            <mat-form-field appearance="outline" class="deadline-part day">
+              <mat-label>День</mat-label>
+              <mat-select
+                [ngModel]="deadlineDay()"
+                (ngModelChange)="deadlineDay.set($event); onDeadlinePartsChange()"
+              >
+                @for (d of dayOptions(); track d) {
+                  <mat-option [value]="d">{{ d }}</mat-option>
+                }
+              </mat-select>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="deadline-part month">
+              <mat-label>Месяц</mat-label>
+              <mat-select
+                [ngModel]="deadlineMonth()"
+                (ngModelChange)="deadlineMonth.set($event); onDeadlinePartsChange()"
+              >
+                @for (m of monthOptions; track m.value) {
+                  <mat-option [value]="m.value">{{ m.label }}</mat-option>
+                }
+              </mat-select>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="deadline-part year">
+              <mat-label>Год</mat-label>
+              <mat-select
+                [ngModel]="deadlineYear()"
+                (ngModelChange)="deadlineYear.set($event); onDeadlinePartsChange()"
+              >
+                @for (y of yearOptions; track y) {
+                  <mat-option [value]="y">{{ y }}</mat-option>
+                }
+              </mat-select>
+            </mat-form-field>
+          </div>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Макс. балл</mat-label>
+            <input matInput type="number" name="max_points" [(ngModel)]="form.max_points" />
+          </mat-form-field>
+        </div>
+
+        <div class="form-row">
+          <mat-form-field appearance="outline">
+            <mat-label>Курс</mat-label>
+            <mat-select name="course_id" [(ngModel)]="form.course_id">
+              @for (course of courses(); track course.id) {
+                <mat-option [value]="course.id">
+                  {{ course.name }} (ID: {{ course.id }})
+                </mat-option>
+              }
+            </mat-select>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>File URL</mat-label>
+            <input matInput name="file_url" [(ngModel)]="form.file_url" />
+          </mat-form-field>
+        </div>
+
+      </mat-card-content>
+      <mat-card-actions align="end">
+        <button mat-button (click)="toggleForm()">Отмена</button>
+        <button mat-raised-button color="primary" (click)="submit()" [disabled]="saving()">
+          {{ saving() ? 'Сохранение...' : (editingId() !== null ? 'Сохранить' : 'Создать') }}
+        </button>
+      </mat-card-actions>
+    </mat-card>
+  }
+
+  @if (loading()) {
+    <div class="loading">
+      <mat-spinner diameter="40"></mat-spinner>
+    </div>
+  }
+
+  @if (!loading() && errorMessage()) {
+    <div class="error-state">
+      <mat-icon>error</mat-icon>
+      <span>{{ errorMessage() }}</span>
+    </div>
+  }
+
+  @if (!loading() && !errorMessage()) {
+    @if (tasks().length === 0) {
+      <div class="empty-state">
+        <mat-icon>assignment</mat-icon>
+        <p>Заданий пока нет</p>
+      </div>
+    } @else {
+      <div class="tasks-grid">
+        @for (task of tasks(); track task.id) {
+          <mat-card class="task-card">
+            <mat-card-header>
+              <mat-card-title>{{ task.name }}</mat-card-title>
+              <mat-card-subtitle>
+                Course ID: {{ task.course_id }} • Deadline: {{ task.deadline | datetime }}
+              </mat-card-subtitle>
+            </mat-card-header>
+            <mat-card-content>
+              <p>{{ task.description }}</p>
+              <p class="task-meta">
+                <mat-icon>military_tech</mat-icon>
+                {{ task.max_points }} points
+              </p>
+              @if (task.file_url) {
+                <p class="task-meta">
+                  <mat-icon>attach_file</mat-icon>
+                  <a
+                    class="file-link"
+                    [href]="task.file_url"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    {{ task.file_url }}
+                  </a>
+                </p>
+              }
+            </mat-card-content>
+            @if (role() === 'teacher' || role() === 'admin') {
+              <mat-card-actions align="end">
+                <button mat-stroked-button (click)="startEdit(task)">
+                  <mat-icon>edit</mat-icon> Редактировать
+                </button>
+                <button mat-stroked-button color="warn" (click)="delete(task.id)">
+                  <mat-icon>delete</mat-icon> Удалить
+                </button>
+              </mat-card-actions>
+            }
+          </mat-card>
+        }
+      </div>
+    }
+  }
+</div>
+

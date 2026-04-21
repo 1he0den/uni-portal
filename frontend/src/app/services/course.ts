@@ -2,21 +2,14 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { Enrollment } from '../models/enrollment.model';
-
-export interface Course {
-  id: number;
-  name: string;
-  description: string;
-  teacher_id: number;
-  credits: number;
-  created_at: string;
-}
+import { API_URL } from '../api/api.config';
+import { Course } from '../api/types';
 
 @Injectable({
   providedIn: 'root'
 })
 export class CourseService {
-  private apiUrl = 'http://127.0.0.1:8000/api';
+  private apiUrl = API_URL;
 
   constructor(private http: HttpClient) {}
 

@@ -1,0 +1,70 @@
+<div class="teacher-courses-page">
+  <div class="page-header">
+    <h1>Teacher courses</h1>
+  </div>
+
+  @if (role() === 'admin') {
+    <mat-card class="controls-card">
+      <mat-card-content>
+        <div class="controls-row">
+          <mat-form-field appearance="outline">
+            <mat-label>Teacher ID</mat-label>
+            <input matInput type="number" [(ngModel)]="teacherIdInput" />
+          </mat-form-field>
+          <button mat-raised-button color="primary" (click)="load()">
+            <mat-icon>refresh</mat-icon>
+            Загрузить
+          </button>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  } @else if (role() === 'teacher') {
+    <mat-card class="controls-card">
+      <mat-card-content class="teacher-hint">
+        <mat-icon>info</mat-icon>
+        <span>Показываем ваши курсы через endpoint `/teachers/&lt;user_id&gt;/courses/`.</span>
+        <button mat-button (click)="load()">
+          <mat-icon>refresh</mat-icon>
+          Обновить
+        </button>
+      </mat-card-content>
+    </mat-card>
+  }
+
+  @if (loading()) {
+    <div class="loading">
+      <mat-spinner diameter="40"></mat-spinner>
+    </div>
+  }
+
+  @if (!loading() && errorMessage()) {
+    <div class="error-state">
+      <mat-icon>error</mat-icon>
+      <span>{{ errorMessage() }}</span>
+    </div>
+  }
+
+  @if (!loading() && !errorMessage()) {
+    @if (courses().length === 0) {
+      <div class="empty-state">
+        <mat-icon>school</mat-icon>
+        <p>Курсов не найдено</p>
+      </div>
+    } @else {
+      <div class="courses-grid">
+        @for (course of courses(); track course.id) {
+          <mat-card class="course-card">
+            <mat-card-header>
+              <mat-card-title>{{ course.name }}</mat-card-title>
+              <mat-card-subtitle>ID: {{ course.id }} • Credits: {{ course.credits }}</mat-card-subtitle>
+            </mat-card-header>
+            <mat-card-content>
+              <p>{{ course.description }}</p>
+            </mat-card-content>
+          </mat-card>
+        }
+      </div>
+    }
+  }
+</div>
+

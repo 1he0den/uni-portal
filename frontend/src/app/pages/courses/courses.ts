@@ -10,9 +10,11 @@ import { MatInputModule } from '@angular/material/input';
 import { MatTabsModule } from '@angular/material/tabs';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
-import { Course, CourseService } from '../../services/course';
+import { CourseService } from '../../services/course';
 import { AuthService } from '../../services/auth';
 import { Enrollment } from '../../models/enrollment.model';
+import { extractApiErrorMessage } from '../../api/error';
+import { Course } from '../../api/types';
 
 @Component({
   selector: 'app-courses',
@@ -117,7 +119,7 @@ export class Courses implements OnInit {
       },
       error: (err) => {
         this.errorMessage.set(
-          err?.error?.detail || 'Не удалось загрузить курсы'
+          extractApiErrorMessage(err) || 'Не удалось загрузить курсы'
         );
         this.loading.set(false);
       },
@@ -151,7 +153,7 @@ export class Courses implements OnInit {
       },
       error: (err) => {
         this.removeEnrolling(courseId);
-        const msg = this.extractError(err) || 'Не удалось записаться на курс';
+        const msg = extractApiErrorMessage(err) || 'Не удалось записаться на курс';
         this.snackBar.open(msg, 'OK', { duration: 4000 });
       },
     });
@@ -171,7 +173,7 @@ export class Courses implements OnInit {
         this.reloadEnrollments();
       },
       error: (err) => {
-        const msg = this.extractError(err) || 'Не удалось отписаться';
+        const msg = extractApiErrorMessage(err) || 'Не удалось отписаться';
         this.snackBar.open(msg, 'OK', { duration: 4000 });
       },
     });
@@ -214,7 +216,7 @@ export class Courses implements OnInit {
       },
       error: (err) => {
         this.creating.set(false);
-        const msg = this.extractError(err) || 'Ошибка сохранения';
+        const msg = extractApiErrorMessage(err) || 'Ошибка сохранения';
         this.snackBar.open(msg, 'OK', { duration: 4000 });
       },
     });
@@ -244,7 +246,7 @@ export class Courses implements OnInit {
         this.loadAll();
       },
       error: (err) => {
-        const msg = this.extractError(err) || 'Не удалось удалить курс';
+        const msg = extractApiErrorMessage(err) || 'Не удалось удалить курс';
         this.snackBar.open(msg, 'OK', { duration: 4000 });
       },
     });
@@ -264,20 +266,5 @@ export class Courses implements OnInit {
     this.newCourse = { name: '', description: '', credits: 0 };
   }
 
-  private extractError(error: unknown): string {
-    const err = error as { error?: Record<string, unknown> | string };
-    const data = err?.error;
-    if (!data) return '';
-    if (typeof data === 'string') return data;
-    if (typeof data === 'object' && 'detail' in data) return String(data['detail']);
-    if (typeof data === 'object') {
-      const entries = Object.entries(data);
-      if (entries.length > 0) {
-        const [field, messages] = entries[0];
-        const msg = Array.isArray(messages) ? messages[0] : messages;
-        return `${field}: ${String(msg)}`;
-      }
-    }
-    return '';
-  }
+  // NOTE: error extraction is centralized in ../../api/error
 }

@@ -1,0 +1,118 @@
+<div class="materials-page">
+  <div class="page-header">
+    <h1>Materials</h1>
+
+    @if (role() === 'teacher' || role() === 'admin') {
+      <button mat-raised-button color="primary" (click)="toggleForm()">
+        <mat-icon>{{ showForm() ? 'close' : 'add' }}</mat-icon>
+        {{ showForm() ? 'Скрыть форму' : 'Добавить материал' }}
+      </button>
+    }
+  </div>
+
+  @if (showForm() && (role() === 'teacher' || role() === 'admin')) {
+    <mat-card class="create-form-card">
+      <mat-card-header>
+        <mat-card-title>
+          {{ editingId() !== null ? 'Редактировать материал' : 'Новый материал' }}
+        </mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Название</mat-label>
+          <input matInput name="title" [(ngModel)]="form.title" />
+        </mat-form-field>
+
+        <div class="form-row">
+          <mat-form-field appearance="outline">
+            <mat-label>File URL</mat-label>
+            <input matInput name="file_url" [(ngModel)]="form.file_url" />
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Курс</mat-label>
+            <mat-select name="course_id" [(ngModel)]="form.course_id">
+              @for (course of courses(); track course.id) {
+                <mat-option [value]="course.id">
+                  {{ course.name }} (ID: {{ course.id }})
+                </mat-option>
+              }
+            </mat-select>
+          </mat-form-field>
+        </div>
+      </mat-card-content>
+      <mat-card-actions align="end">
+        <button mat-button (click)="toggleForm()">Отмена</button>
+        <button mat-raised-button color="primary" (click)="submit()" [disabled]="saving()">
+          {{ saving() ? 'Сохранение...' : (editingId() !== null ? 'Сохранить' : 'Создать') }}
+        </button>
+      </mat-card-actions>
+    </mat-card>
+  }
+
+  @if (loading()) {
+    <div class="loading">
+      <mat-spinner diameter="40"></mat-spinner>
+    </div>
+  }
+
+  @if (!loading() && errorMessage()) {
+    <div class="error-state">
+      <mat-icon>error</mat-icon>
+      <span>{{ errorMessage() }}</span>
+    </div>
+  }
+
+  @if (!loading() && !errorMessage()) {
+    @if (materials().length === 0) {
+      <div class="empty-state">
+        <mat-icon>folder_open</mat-icon>
+        <p>Материалов пока нет</p>
+      </div>
+    } @else {
+      <div class="materials-grid">
+        @for (m of materials(); track m.id) {
+          <mat-card class="material-card">
+            <mat-card-header>
+              <mat-card-title>{{ m.title }}</mat-card-title>
+              <mat-card-subtitle>
+                {{ courseLabel(m.course_id) }} • {{ m.uploaded_at | datetime }}
+              </mat-card-subtitle>
+            </mat-card-header>
+            <mat-card-content>
+              @if (m.file_url) {
+                <p class="meta">
+                  <mat-icon>link</mat-icon>
+                  <a
+                    class="file-link"
+                    [href]="m.file_url"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    {{ m.file_url }}
+                  </a>
+                </p>
+              } @else {
+                <p class="meta">
+                  <mat-icon>link_off</mat-icon>
+                  <span>URL не указан</span>
+                </p>
+              }
+            </mat-card-content>
+            @if (role() === 'teacher' || role() === 'admin') {
+              <mat-card-actions align="end">
+                <button mat-stroked-button (click)="startEdit(m)">
+                  <mat-icon>edit</mat-icon> Редактировать
+                </button>
+                <button mat-stroked-button color="warn" (click)="delete(m.id)">
+                  <mat-icon>delete</mat-icon> Удалить
+                </button>
+              </mat-card-actions>
+            }
+          </mat-card>
+        }
+      </div>
+    }
+  }
+</div>
+
